@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="universite_paris8.iut.belbaroudi.museelupin.HelloController">
+    <bottom>
+        <HBox prefHeight="80.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <children>
+                <VBox prefHeight="60.0" prefWidth="50.0">
+                    <children>
+                        <ImageView fitHeight="50.0" fitWidth="309.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label prefHeight="16.0" prefWidth="85.0" text="Bas de la page" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </bottom>
+    <top>
+        <HBox prefHeight="60.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+    </top>
+    <center>
+        <StackPane BorderPane.alignment="CENTER">
+            <TilePane fx:id="terrain"
+                      maxHeight="-Infinity" maxWidth="-Infinity"
+                      minHeight="-Infinity" minWidth="-Infinity"
+                      prefHeight="800.0" prefWidth="640.0"
+                      prefColumns="20"
+                      prefTileWidth="32" prefTileHeight="32"/>
+            <Pane fx:id="overlayPane"
+                  style="-fx-background-color: transparent;"
+                  mouseTransparent="true"
+                  prefWidth="640" prefHeight="800"/>
+        </StackPane>
+    </center>
+</BorderPane>
