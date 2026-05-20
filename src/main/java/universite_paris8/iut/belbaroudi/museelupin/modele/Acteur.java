@@ -45,15 +45,7 @@ public class Acteur {
     public String getId() {
         return id;
     }
-    /*
-        public abstract String type();
 
-        public abstract int speed();
-
-        public abstract boolean fly();
-
-        public abstract boolean walk();
-    */
     public void move(){
         int x = this.getX();
         int y = this.getY();

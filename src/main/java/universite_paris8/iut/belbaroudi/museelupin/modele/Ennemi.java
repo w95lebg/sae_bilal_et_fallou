@@ -57,5 +57,8 @@ public class Ennemi {
             derniereDirection = "gauche";
             System.out.println("gauche");
         }
+        else {
+            System.out.println("Fin !");
+        }
     }
 }
