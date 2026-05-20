@@ -33,7 +33,7 @@ public class HelloController implements Initializable {
 
     private final int tileSize = 32;
 
-    public void initialize(URL url, ResourceBundle resourcebundle){
+    public void initialize(URL url, ResourceBundle resourcebundle) {
         gameLoop = new Timeline();
         this.env = new Terrain();
         // Entrée = case 11, ligne 4, colonne 0 dans ton tableau
@@ -55,8 +55,7 @@ public class HelloController implements Initializable {
                 (ev -> {
                     if (this.temps == 10000) {
                         this.gameLoop.stop();
-                    }
-                    else if (this.temps % 50 == 0) {
+                    } else if (this.temps % 50 == 0) {
                         env.unTour();
                     }
                     this.temps++;
@@ -66,23 +65,23 @@ public class HelloController implements Initializable {
     }
 
     public void chargerMap() {
-        Image mur      = new Image(String.valueOf(getClass().getResource("/pictures/tile_0_mur.png")));
-        Image chemin   = new Image(String.valueOf(getClass().getResource("/pictures/tile_1_chemin.png")));
-        Image marbre   = new Image(String.valueOf(getClass().getResource("/pictures/tile_2_marbre.png")));
-        Image slot     = new Image(String.valueOf(getClass().getResource("/pictures/tile_3_slot.png")));
+        Image mur = new Image(String.valueOf(getClass().getResource("/pictures/tile_0_mur.png")));
+        Image chemin = new Image(String.valueOf(getClass().getResource("/pictures/tile_1_chemin.png")));
+        Image marbre = new Image(String.valueOf(getClass().getResource("/pictures/tile_2_marbre.png")));
+        Image slot = new Image(String.valueOf(getClass().getResource("/pictures/tile_3_slot.png")));
         Image obstacle = new Image(String.valueOf(getClass().getResource("/pictures/tile_4_obstacle.png")));
-        Image entree   = new Image(String.valueOf(getClass().getResource("/pictures/tile_11_entree.png")));
-        Image sortie   = new Image(String.valueOf(getClass().getResource("/pictures/tile_12_sortie.png")));
+        Image entree = new Image(String.valueOf(getClass().getResource("/pictures/tile_11_entree.png")));
+        Image sortie = new Image(String.valueOf(getClass().getResource("/pictures/tile_12_sortie.png")));
 
         int[][] tab = env.getTab();
         for (int i = 0; i < tab.length; i++) {
             for (int j = 0; j < tab[i].length; j++) {
                 ImageView imv = null;
-                if      (tab[i][j] == 0)  imv = setUpImage(mur);
-                else if (tab[i][j] == 1)  imv = setUpImage(chemin);
-                else if (tab[i][j] == 2)  imv = setUpImage(marbre);
-                else if (tab[i][j] == 3)  imv = setUpImage(slot);
-                else if (tab[i][j] == 4)  imv = setUpImage(obstacle);
+                if (tab[i][j] == 0) imv = setUpImage(mur);
+                else if (tab[i][j] == 1) imv = setUpImage(chemin);
+                else if (tab[i][j] == 2) imv = setUpImage(marbre);
+                else if (tab[i][j] == 3) imv = setUpImage(slot);
+                else if (tab[i][j] == 4) imv = setUpImage(obstacle);
                 else if (tab[i][j] == 11) imv = setUpImage(entree);
                 else if (tab[i][j] == 12) imv = setUpImage(sortie);
                 System.out.println("ligne : " + i + " ; colonne : " + j);
@@ -91,7 +90,7 @@ public class HelloController implements Initializable {
         }
     }
 
-    public ImageView setUpImage(Image img){
+    public ImageView setUpImage(Image img) {
         ImageView imv = new ImageView();
         imv.setImage(img);
         imv.setFitHeight(tileSize);
@@ -99,15 +98,24 @@ public class HelloController implements Initializable {
         return imv;
     }
 
-    public void creerSprite(Ennemi p){
-        Circle sprite = new Circle(3);
+    public void creerSprite(Ennemi p) {
 
+        // Chargement de l'image
+        Image imageEnnemi = new Image(
+                getClass().getResourceAsStream("/pictures/enemy_faussaire.png")
+        );
+
+        ImageView sprite = new ImageView(imageEnnemi);
+
+        sprite.setFitWidth(tileSize);
+        sprite.setFitHeight(tileSize);
         sprite.setId(p.getId());
-        sprite.setFill(Color.RED);
-
-        sprite.translateXProperty().bind(p.xProperty().multiply(tileSize).add(tileSize / 2));
-        sprite.translateYProperty().bind(p.yProperty().add(1).multiply(tileSize).subtract(tileSize / 2));
-
+        sprite.translateXProperty().bind(
+                p.xProperty().multiply(tileSize)
+        );
+        sprite.translateYProperty().bind(
+                p.yProperty().multiply(tileSize)
+        );
         pane.getChildren().add(sprite);
     }
 }
