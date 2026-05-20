@@ -1,135 +1,113 @@
 package universite_paris8.iut.belbaroudi.museelupin;
 
-import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
-import universite_paris8.iut.belbaroudi.museelupin.modele.Acteur;
-import universite_paris8.iut.belbaroudi.museelupin.modele.Ennemi;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import universite_paris8.iut.belbaroudi.museelupin.modele.Terrain;
+import universite_paris8.iut.belbaroudi.museelupin.modele.Ennemi;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
 
-    @FXML private TilePane terrain;
-    @FXML private Pane     overlayPane; // calque transparent pour les sprites ennemis
+    private Terrain env;
 
-    private Terrain modele;
+    private Timeline gameLoop;
 
-    private static final int TILE_SIZE = 32;
+    private int temps;
 
-    // Image du sprite ennemi
-    private Image imgEnnemi;
+    @FXML
+    private Pane pane;
 
-    // Map Acteur → ImageView pour retrouver le sprite de chaque ennemi
-    // (comme dans le TP où chaque acteur a son propre affichage)
-    private Map<Acteur, ImageView> sprites = new HashMap<>();
+    @FXML
+    private TilePane terrain;
 
-    // ── initialize ────────────────────────────────────────────────────
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        modele = new Terrain();
+    private final int tileSize = 32;
 
-        // 1. Afficher les tuiles (ton code existant, intact)
-        vueModele();
+    public void initialize(URL url, ResourceBundle resourcebundle){
+        gameLoop = new Timeline();
+        this.env = new Terrain();
+        // Entrée = case 11, ligne 4, colonne 0 dans ton tableau
+        Ennemi p1 = new Ennemi(0, 4, "E", env);
+        this.creerSprite(p1);
+        this.env.ajouterPersonnage(p1);
+        chargerMap();
+        initAnimation();
+        gameLoop.play();
+    }
 
-        // 2. Charger le sprite de l'ennemi
-        imgEnnemi = new Image(
-                getClass().getResourceAsStream(Ennemi.SPRITE),
-                TILE_SIZE, TILE_SIZE, false, false
+    private void initAnimation() {
+        this.gameLoop = new Timeline();
+        this.temps = 0;
+        this.gameLoop.setCycleCount(Timeline.INDEFINITE);
+
+        KeyFrame kf = new KeyFrame(
+                Duration.seconds(0.017),
+                (ev -> {
+                    if (this.temps == 10000) {
+                        this.gameLoop.stop();
+                    }
+                    else if (this.temps % 50 == 0) {
+                        env.unTour();
+                    }
+                    this.temps++;
+                })
         );
-
-        // 3. Créer un ennemi sur la case 11 et l'ajouter au terrain
-        //    (comme Lancement.java du TP fait : env.ajouter(new Mouton(env)))
-        int[] entree = modele.getPositionEntree();
-        Ennemi e = new Ennemi(entree[0], entree[1], modele);
-        e.calculerChemin();
-        modele.ajouter(e);
-
-        // Créer son ImageView et l'ajouter dans l'overlayPane
-        ImageView iv = new ImageView(imgEnnemi);
-        iv.setSmooth(false);
-        positionner(iv, e);
-        overlayPane.getChildren().add(iv);
-        sprites.put(e, iv);
-
-        // 4. GameLoop — appelle modele.unTour() à chaque tick
-        //    (comme la boucle for du TP qui appelle unTour() n fois)
-        new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                modele.unTour();
-                rafraichirSprites();
-            }
-        }.start();
+        this.gameLoop.getKeyFrames().add(kf);
     }
 
-    /**
-     * Met à jour la position de chaque sprite selon la position de son Acteur.
-     * Supprime les sprites des acteurs morts (comme unTour() enlève les morts).
-     */
-    private void rafraichirSprites() {
-        // Supprimer les sprites des acteurs qui ne sont plus dans la liste
-        sprites.entrySet().removeIf(entry -> {
-            if (!modele.getActeurs().contains(entry.getKey())) {
-                overlayPane.getChildren().remove(entry.getValue());
-                return true;
-            }
-            return false;
-        });
+    public void chargerMap() {
+        Image mur      = new Image(String.valueOf(getClass().getResource("/pictures/tile_0_mur.png")));
+        Image chemin   = new Image(String.valueOf(getClass().getResource("/pictures/tile_1_chemin.png")));
+        Image marbre   = new Image(String.valueOf(getClass().getResource("/pictures/tile_2_marbre.png")));
+        Image slot     = new Image(String.valueOf(getClass().getResource("/pictures/tile_3_slot.png")));
+        Image obstacle = new Image(String.valueOf(getClass().getResource("/pictures/tile_4_obstacle.png")));
+        Image entree   = new Image(String.valueOf(getClass().getResource("/pictures/tile_11_entree.png")));
+        Image sortie   = new Image(String.valueOf(getClass().getResource("/pictures/tile_12_sortie.png")));
 
-        // Repositionner les sprites des acteurs encore vivants
-        for (Acteur a : modele.getActeurs()) {
-            ImageView iv = sprites.get(a);
-            if (iv != null) {
-                positionner(iv, a);
-            }
-        }
-    }
-
-    /** Convertit (ligne, colonne) en pixels et positionne l'ImageView */
-    private void positionner(ImageView iv, Acteur a) {
-        iv.setLayoutX(a.getColonne() * TILE_SIZE);
-        iv.setLayoutY(a.getLigne()   * TILE_SIZE);
-    }
-
-    // ── Ton code existant, inchangé ───────────────────────────────────
-    public void vueModele() {
-        Image mur      = new Image(getClass().getResourceAsStream("/pictures/tile_0_mur.png"));
-        Image chemin   = new Image(getClass().getResourceAsStream("/pictures/tile_1_chemin.png"));
-        Image marbre   = new Image(getClass().getResourceAsStream("/pictures/tile_2_marbre.png"));
-        Image slot     = new Image(getClass().getResourceAsStream("/pictures/tile_3_slot.png"));
-        Image obstacle = new Image(getClass().getResourceAsStream("/pictures/tile_4_obstacle.png"));
-        Image entree   = new Image(getClass().getResourceAsStream("/pictures/tile_11_entree.png"));
-        Image sortie   = new Image(getClass().getResourceAsStream("/pictures/tile_12_sortie.png"));
-
-        int[][] tab = modele.getTab();
+        int[][] tab = env.getTab();
         for (int i = 0; i < tab.length; i++) {
             for (int j = 0; j < tab[i].length; j++) {
-                Image im = null;
-                if      (tab[i][j] == 0)  im = mur;
-                else if (tab[i][j] == 1)  im = chemin;
-                else if (tab[i][j] == 2)  im = marbre;
-                else if (tab[i][j] == 3)  im = slot;
-                else if (tab[i][j] == 4)  im = obstacle;
-                else if (tab[i][j] == 11) im = entree;
-                else if (tab[i][j] == 12) im = sortie;
-                terrain.getChildren().add(creerImage(im));
+                ImageView imv = null;
+                if      (tab[i][j] == 0)  imv = setUpImage(mur);
+                else if (tab[i][j] == 1)  imv = setUpImage(chemin);
+                else if (tab[i][j] == 2)  imv = setUpImage(marbre);
+                else if (tab[i][j] == 3)  imv = setUpImage(slot);
+                else if (tab[i][j] == 4)  imv = setUpImage(obstacle);
+                else if (tab[i][j] == 11) imv = setUpImage(entree);
+                else if (tab[i][j] == 12) imv = setUpImage(sortie);
+                System.out.println("ligne : " + i + " ; colonne : " + j);
+                terrain.getChildren().add(imv);
             }
         }
     }
 
-    public ImageView creerImage(Image im) {
-        ImageView imv = new ImageView(im);
-        imv.setFitWidth(TILE_SIZE);
-        imv.setFitHeight(TILE_SIZE);
+    public ImageView setUpImage(Image img){
+        ImageView imv = new ImageView();
+        imv.setImage(img);
+        imv.setFitHeight(tileSize);
+        imv.setFitWidth(tileSize);
         return imv;
+    }
+
+    public void creerSprite(Ennemi p){
+        Circle sprite = new Circle(3);
+
+        sprite.setId(p.getId());
+        sprite.setFill(Color.RED);
+
+        sprite.translateXProperty().bind(p.xProperty().multiply(tileSize).add(tileSize / 2));
+        sprite.translateYProperty().bind(p.yProperty().add(1).multiply(tileSize).subtract(tileSize / 2));
+
+        pane.getChildren().add(sprite);
     }
 }
