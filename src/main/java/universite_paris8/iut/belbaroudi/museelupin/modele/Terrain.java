@@ -1,15 +1,10 @@
 package universite_paris8.iut.belbaroudi.museelupin.modele;
 
-import java.util.ArrayList;
-
-//TODO faire deux classes Terrain et Environnement
-
 public class Terrain {
-    private ArrayList<Ennemi> personnages;
 
     public static final int tileSize = 32;
 
-    private int [][] tab = {
+    private int[][] tab = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 1, 1, 1, 1, 0, 0, 0, 0, 3, 2, 2, 3, 0, 0, 0, 0, 0, 0, 0},
             {0, 1, 0, 0, 1, 0, 0, 3, 2, 2, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0},
@@ -32,21 +27,7 @@ public class Terrain {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     };
 
-    public Terrain(){
-        this.personnages = new ArrayList<>();
-    }
-
-    public int [][] getTab(){
+    public int[][] getTab() {
         return tab;
-    }
-
-    public void ajouterPersonnage(Ennemi p){
-        this.personnages.add(p);
-    }
-
-    public void unTour(){
-        for (Ennemi p : personnages){
-            p.move();
-        }
     }
 }
