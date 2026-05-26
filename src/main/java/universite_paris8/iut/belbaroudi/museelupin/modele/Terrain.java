@@ -2,8 +2,13 @@ package universite_paris8.iut.belbaroudi.museelupin.modele;
 
 import java.util.ArrayList;
 
+//TODO faire deux classes Terrain et Environnement
+
 public class Terrain {
     private ArrayList<Ennemi> personnages;
+
+    public static final int tileSize = 32;
+
     private int [][] tab = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 1, 1, 1, 1, 0, 0, 0, 0, 3, 2, 2, 3, 0, 0, 0, 0, 0, 0, 0},

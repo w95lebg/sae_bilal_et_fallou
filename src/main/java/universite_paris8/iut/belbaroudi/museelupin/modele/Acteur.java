@@ -66,7 +66,6 @@ public class Acteur {
         }  else if (this.env.getTab()[y][x-1]==1) {
             setX(x-1);
             System.out.println("gauche");
-
         }
 
     }

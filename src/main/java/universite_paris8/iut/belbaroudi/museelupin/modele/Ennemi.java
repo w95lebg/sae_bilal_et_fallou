@@ -11,8 +11,8 @@ public class Ennemi {
 
     private Terrain env;
 
-    // Mémorise la dernière direction pour ne pas revenir en arrière
-    private String derniereDirection = "";
+
+    private String derniereDirection = ""; //TODO : utiliser un type char ou int
 
     public Ennemi(int x, int y, String code, Terrain e){
         this.id = code + i;

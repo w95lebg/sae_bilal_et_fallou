@@ -11,7 +11,7 @@
    <center>
       <Pane fx:id="pane" prefHeight="640.0" prefWidth="640.0" BorderPane.alignment="CENTER">
          <children>
-            <TilePane fx:id="terrain" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="640.0" prefColumns="20" prefTileWidth="32" prefTileHeight="32" />
+            <TilePane fx:id="paneTerrain" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="640.0" prefColumns="20" prefTileWidth="32" prefTileHeight="32" />
          </children>
       </Pane>
    </center>
