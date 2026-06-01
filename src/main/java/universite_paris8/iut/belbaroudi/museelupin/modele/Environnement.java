@@ -18,7 +18,6 @@ public class Environnement {
         this.personnages.add(p);
     }
 
-
     public void unTour(double vitesse) {
         for (Ennemi p : personnages) {
             p.avancer(vitesse);

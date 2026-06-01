@@ -40,7 +40,7 @@ public class HelloController implements Initializable {
         // Entrée = case 11, ligne 4, colonne 0
         Ennemi p1 = new Ennemi(0, 4, "E", terrain);
 
-        p1.move();
+      //  p1.move();
 
         EnnemiVue ennemiVue = new EnnemiVue(p1, pane);
         ennemiVue.creerSprite();
