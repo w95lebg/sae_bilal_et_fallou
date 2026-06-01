@@ -7,12 +7,32 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="universite_paris8.iut.belbaroudi.museelupin.HelloController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="640.0" prefWidth="780.0"
+            xmlns="http://javafx.com/javafx/8.0.40"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="universite_paris8.iut.belbaroudi.museelupin.HelloController">
+
    <center>
       <Pane fx:id="pane" prefHeight="640.0" prefWidth="640.0" BorderPane.alignment="CENTER">
          <children>
-            <TilePane fx:id="paneTerrain" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="640.0" prefColumns="20" prefTileWidth="32" prefTileHeight="32" />
+            <TilePane fx:id="paneTerrain"
+                      maxHeight="-Infinity" maxWidth="-Infinity"
+                      minHeight="-Infinity" minWidth="-Infinity"
+                      prefHeight="640.0" prefWidth="640.0"
+                      prefColumns="20" prefTileWidth="32" prefTileHeight="32" />
          </children>
       </Pane>
    </center>
+
+   <right>
+      <VBox fx:id="panneauTours" prefWidth="140.0" prefHeight="640.0"
+            spacing="10.0" style="-fx-background-color: #2b2b2b; -fx-padding: 10;"
+            BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Tours" style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" />
+         </children>
+      </VBox>
+   </right>
+
 </BorderPane>
