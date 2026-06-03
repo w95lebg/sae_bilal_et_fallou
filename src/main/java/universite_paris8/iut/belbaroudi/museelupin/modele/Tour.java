@@ -18,4 +18,8 @@ public class Tour {
     public String getImagePath() { return imagePath; }
     public int    getCaseX()     { return caseX; }
     public int    getCaseY()     { return caseY; }
+
+    public boolean estLaser() {
+        return imagePath != null && imagePath.contains("laser");
+    }
 }

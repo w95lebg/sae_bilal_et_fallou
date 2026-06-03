@@ -24,9 +24,8 @@ import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
 
-    private static final double VITESSE = 2.0;
+    private static final double VITESSE = 1.0;
 
-    // Noms et chemins des 5 tours disponibles
     private static final String[][] TOURS_DISPONIBLES = {
             { "Camera",     "/pictures/tower_camera.png"     },
             { "Brouilleur", "/pictures/tower_brouilleur.png" },
@@ -39,7 +38,6 @@ public class HelloController implements Initializable {
     private Environnement environnement;
     private Timeline gameLoop;
 
-    // La tour sélectionnée dans le panneau (null = aucune)
     private String tourSelectionnee = null;
 
     @FXML private Pane pane;
@@ -66,7 +64,6 @@ public class HelloController implements Initializable {
         gameLoop.play();
     }
 
-    // Remplit le panneau de droite avec les boutons de tours
     private void remplirPanneauTours() {
         for (String[] tourInfo : TOURS_DISPONIBLES) {
             String nom       = tourInfo[0];
@@ -90,10 +87,8 @@ public class HelloController implements Initializable {
 
             bouton.getChildren().addAll(iv, label);
 
-            // Clic sur le bouton → sélectionner cette tour
             bouton.setOnMouseClicked(e -> {
                 tourSelectionnee = imagePath;
-                // Mettre en surbrillance le bouton sélectionné
                 for (javafx.scene.Node node : panneauTours.getChildren()) {
                     node.setStyle(
                             "-fx-background-color: #3c3f41; -fx-padding: 6; " +
@@ -110,7 +105,6 @@ public class HelloController implements Initializable {
         }
     }
 
-    // Gère le clic sur le terrain pour poser une tour sur une case "3"
     private void gererClicSurTerrain() {
         pane.setOnMouseClicked(e -> {
             if (tourSelectionnee == null) return;
@@ -119,16 +113,18 @@ public class HelloController implements Initializable {
             int caseY = (int) e.getY() / Terrain.tileSize;
             int[][] tab = terrain.getTab();
 
-            // Vérifier que la case est bien un slot (valeur 3)
             if (caseY >= 0 && caseY < tab.length &&
                     caseX >= 0 && caseX < tab[0].length &&
                     tab[caseY][caseX] == 3) {
 
                 Tour tour = new Tour(tourSelectionnee, tourSelectionnee, caseX, caseY);
+
+                // Enregistrer la tour dans le modèle (nécessaire pour le laser)
+                environnement.ajouterTour(tour);
+
                 TourVue tourVue = new TourVue(tour, pane);
                 tourVue.afficher();
 
-                // Marquer la case comme occupée (on change le 3 en 0)
                 tab[caseY][caseX] = 0;
             }
         });

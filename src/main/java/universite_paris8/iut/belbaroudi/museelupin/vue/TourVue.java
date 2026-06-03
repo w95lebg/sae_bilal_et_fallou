@@ -25,7 +25,6 @@ public class TourVue {
         sprite.setFitWidth(Terrain.tileSize);
         sprite.setFitHeight(Terrain.tileSize);
 
-        // Positionner la tour sur la bonne case en pixels
         sprite.setTranslateX(tour.getCaseX() * Terrain.tileSize);
         sprite.setTranslateY(tour.getCaseY() * Terrain.tileSize);
 

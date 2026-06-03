@@ -1,13 +1,34 @@
 package universite_paris8.iut.belbaroudi.museelupin.modele;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+
 public class Ennemi extends Acteur {
 
     private char derniereDirection = ' ';
+
+    private DoubleProperty vie = new SimpleDoubleProperty(1.0);
+
+    private boolean dansPorteeLaser = false;
 
     public Ennemi(int x, int y, String code, Terrain e) {
         super(x, y, code, e);
     }
 
+    // vie
+    public double getVie()               { return vie.get(); }
+    public DoubleProperty vieProperty()  { return vie; }
+
+    public boolean isDansPorteeLaser()            { return dansPorteeLaser; }
+    public void    setDansPorteeLaser(boolean v)  { dansPorteeLaser = v; }
+
+    public void prendresDegats(double pourcentage) {
+        vie.set(Math.max(0.0, vie.get() - pourcentage));
+    }
+
+    public boolean estMort() { return vie.get() <= 0.0; }
+
+    // direction
     @Override
     public void move() {
         int tileSize = Terrain.tileSize;
