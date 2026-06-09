@@ -1,11 +1,14 @@
 package universite_paris8.iut.belbaroudi.museelupin.modele;
 
+import javafx.scene.image.ImageView;
+
 public class Tour {
 
     private String nom;
     private String imagePath;
     private int caseX;
     private int caseY;
+    private ImageView spriteView;
 
     public Tour(String nom, String imagePath, int caseX, int caseY) {
         this.nom       = nom;
@@ -22,4 +25,7 @@ public class Tour {
     public boolean estLaser() {
         return imagePath != null && imagePath.contains("laser");
     }
+
+    public ImageView getSpriteView()            { return spriteView; }
+    public void      setSpriteView(ImageView v) { spriteView = v; }
 }

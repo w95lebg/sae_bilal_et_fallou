@@ -47,7 +47,7 @@ public class HelloController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourcebundle) {
         this.terrain      = new Terrain();
-        this.environnement = new Environnement(terrain);
+        this.environnement = new Environnement(terrain, pane);
 
         TerrainVue terrainVue = new TerrainVue(terrain, paneTerrain);
         terrainVue.chargerMap();

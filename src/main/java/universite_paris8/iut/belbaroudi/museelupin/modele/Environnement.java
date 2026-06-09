@@ -1,17 +1,23 @@
 package universite_paris8.iut.belbaroudi.museelupin.modele;
 
+import javafx.application.Platform;
+import javafx.scene.layout.Pane;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Environnement {
 
     private Terrain terrain;
     private ArrayList<Ennemi> personnages;
     private ArrayList<Tour>   tours;
+    private Pane pane;
 
-    public Environnement(Terrain terrain) {
+    public Environnement(Terrain terrain, Pane pane) {
         this.terrain      = terrain;
         this.personnages  = new ArrayList<>();
         this.tours        = new ArrayList<>();
+        this.pane         = pane;
     }
 
     public Terrain getTerrain() { return terrain; }
@@ -23,8 +29,9 @@ public class Environnement {
     public void unTour(double vitesse) {
         for (Ennemi p : personnages) {
             p.avancer(vitesse);
-            System.out.println(p.getVie());
         }
+
+        ArrayList<Tour> toursASupprimer = new ArrayList<>();
 
         for (Tour t : tours) {
             if (!t.estLaser()) continue;
@@ -42,10 +49,25 @@ public class Environnement {
                     if (!e.isDansPorteeLaser()) {
                         e.prendresDegats(0.5);
                         e.setDansPorteeLaser(true);
+
+                        // Si l'ennemi vient de mourir, la tour laser se détruit
+                        if (e.estMort()) {
+                            toursASupprimer.add(t);
+                            // Libérer la case (remettre en slot de placement)
+                            terrain.getTab()[t.getCaseY()][t.getCaseX()] = 3;
+                        }
                     }
                 } else {
                     e.setDansPorteeLaser(false);
                 }
+            }
+        }
+
+        // Supprimer les tours laser détruites
+        for (Tour t : toursASupprimer) {
+            tours.remove(t);
+            if (t.getSpriteView() != null) {
+                Platform.runLater(() -> pane.getChildren().remove(t.getSpriteView()));
             }
         }
     }
