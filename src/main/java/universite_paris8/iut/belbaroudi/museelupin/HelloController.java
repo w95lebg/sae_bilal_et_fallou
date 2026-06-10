@@ -2,6 +2,8 @@ package universite_paris8.iut.belbaroudi.museelupin;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -25,28 +27,33 @@ import java.util.ResourceBundle;
 public class HelloController implements Initializable {
 
     private static final double VITESSE = 1.0;
+    private static final int    BUDGET_DEPART = 1000;
 
+    // { nom, imagePath, prix }
     private static final String[][] TOURS_DISPONIBLES = {
-            { "Camera",     "/pictures/tower_camera.png"     },
-            { "Brouilleur", "/pictures/tower_brouilleur.png" },
-            { "Gardien",    "/pictures/tower_gardien.png"    },
-            { "Laser",      "/pictures/tower_laser.png"      },
-            { "Porte",      "/pictures/tower_porte.png"      }
+            { "Camera",     "/pictures/tower_camera.png",     "100" },
+            { "Brouilleur", "/pictures/tower_brouilleur.png", "150" },
+            { "Gardien",    "/pictures/tower_gardien.png",    "200" },
+            { "Laser",      "/pictures/tower_laser.png",      "250" },
+            { "Porte",      "/pictures/tower_porte.png",      "120" },
     };
 
-    private Terrain terrain;
+    private Terrain      terrain;
     private Environnement environnement;
-    private Timeline gameLoop;
+    private Timeline     gameLoop;
 
-    private String tourSelectionnee = null;
+    private String          tourSelectionnee     = null;
+    private int             prixTourSelectionnee = 0;
 
-    @FXML private Pane pane;
-    @FXML private TilePane paneTerrain;
-    @FXML private VBox panneauTours;
+    private IntegerProperty budget = new SimpleIntegerProperty(BUDGET_DEPART);
+
+    @FXML private Pane      pane;
+    @FXML private TilePane  paneTerrain;
+    @FXML private VBox      panneauTours;
 
     @Override
     public void initialize(URL url, ResourceBundle resourcebundle) {
-        this.terrain      = new Terrain();
+        this.terrain       = new Terrain();
         this.environnement = new Environnement(terrain, pane);
 
         TerrainVue terrainVue = new TerrainVue(terrain, paneTerrain);
@@ -65,9 +72,20 @@ public class HelloController implements Initializable {
     }
 
     private void remplirPanneauTours() {
+
+        Label labelBudget = new Label();
+        labelBudget.setStyle(
+                "-fx-text-fill: #f1c40f; -fx-font-size: 14px; -fx-font-weight: bold;" +
+                        "-fx-padding: 8 6 8 6;"
+        );
+        // bind maj automatque
+        labelBudget.textProperty().bind(budget.asString("Budget : %d $"));
+        panneauTours.getChildren().add(labelBudget);
+
         for (String[] tourInfo : TOURS_DISPONIBLES) {
             String nom       = tourInfo[0];
             String imagePath = tourInfo[1];
+            int    prix      = Integer.parseInt(tourInfo[2]);
 
             VBox bouton = new VBox(4);
             bouton.setStyle(
@@ -82,18 +100,25 @@ public class HelloController implements Initializable {
             iv.setFitHeight(48);
             iv.setPreserveRatio(true);
 
-            Label label = new Label(nom);
-            label.setStyle("-fx-text-fill: white; -fx-font-size: 12;");
+            Label labelNom  = new Label(nom);
+            labelNom.setStyle("-fx-text-fill: white; -fx-font-size: 12;");
 
-            bouton.getChildren().addAll(iv, label);
+            Label labelPrix = new Label(prix + " $");
+            labelPrix.setStyle("-fx-text-fill: #f1c40f; -fx-font-size: 11;");
+
+            bouton.getChildren().addAll(iv, labelNom, labelPrix);
 
             bouton.setOnMouseClicked(e -> {
-                tourSelectionnee = imagePath;
+                tourSelectionnee     = imagePath;
+                prixTourSelectionnee = prix;
+
                 for (javafx.scene.Node node : panneauTours.getChildren()) {
-                    node.setStyle(
-                            "-fx-background-color: #3c3f41; -fx-padding: 6; " +
-                                    "-fx-border-color: #555; -fx-border-width: 1; -fx-cursor: hand;"
-                    );
+                    if (node instanceof VBox) {
+                        node.setStyle(
+                                "-fx-background-color: #3c3f41; -fx-padding: 6; " +
+                                        "-fx-border-color: #555; -fx-border-width: 1; -fx-cursor: hand;"
+                        );
+                    }
                 }
                 bouton.setStyle(
                         "-fx-background-color: #4a6fa5; -fx-padding: 6; " +
@@ -109,6 +134,12 @@ public class HelloController implements Initializable {
         pane.setOnMouseClicked(e -> {
             if (tourSelectionnee == null) return;
 
+            // Vérifier le budget avant tout
+            if (budget.get() < prixTourSelectionnee) {
+                afficherMessageBudget();
+                return;
+            }
+
             int caseX = (int) e.getX() / Terrain.tileSize;
             int caseY = (int) e.getY() / Terrain.tileSize;
             int[][] tab = terrain.getTab();
@@ -117,9 +148,10 @@ public class HelloController implements Initializable {
                     caseX >= 0 && caseX < tab[0].length &&
                     tab[caseY][caseX] == 3) {
 
-                Tour tour = new Tour(tourSelectionnee, tourSelectionnee, caseX, caseY);
+                // maj
+                budget.set(budget.get() - prixTourSelectionnee);
 
-                // Enregistrer la tour dans le modèle (nécessaire pour le laser)
+                Tour tour = new Tour(tourSelectionnee, tourSelectionnee, caseX, caseY);
                 environnement.ajouterTour(tour);
 
                 TourVue tourVue = new TourVue(tour, pane);
@@ -128,6 +160,22 @@ public class HelloController implements Initializable {
                 tab[caseY][caseX] = 0;
             }
         });
+    }
+
+    private void afficherMessageBudget() {
+        Label msg = new Label("Budget insuffisant !");
+        msg.setStyle(
+                "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
+                        "-fx-background-color: rgba(180,0,0,0.85);" +
+                        "-fx-padding: 6 12 6 12; -fx-background-radius: 6;"
+        );
+        msg.setTranslateX(10);
+        msg.setTranslateY(10);
+        pane.getChildren().add(msg);
+
+        new Timeline(new KeyFrame(Duration.millis(1500),
+                ev -> pane.getChildren().remove(msg))
+        ).play();
     }
 
     private void initAnimation() {

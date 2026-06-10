@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Environnement {
 
@@ -47,13 +46,12 @@ public class Environnement {
 
                 if (dx <= Terrain.tileSize * 2 && dy <= Terrain.tileSize * 2) {
                     if (!e.isDansPorteeLaser()) {
-                        e.prendresDegats(0.5);
+                        e.prendresDegats(0.25);
                         e.setDansPorteeLaser(true);
 
-                        // Si l'ennemi vient de mourir, la tour laser se détruit
-                        if (e.estMort()) {
+
+                        if (!toursASupprimer.contains(t)) {
                             toursASupprimer.add(t);
-                            // Libérer la case (remettre en slot de placement)
                             terrain.getTab()[t.getCaseY()][t.getCaseX()] = 3;
                         }
                     }
@@ -63,7 +61,7 @@ public class Environnement {
             }
         }
 
-        // Supprimer les tours laser détruites
+        // Supprimer les tours lasers détruites
         for (Tour t : toursASupprimer) {
             tours.remove(t);
             if (t.getSpriteView() != null) {
