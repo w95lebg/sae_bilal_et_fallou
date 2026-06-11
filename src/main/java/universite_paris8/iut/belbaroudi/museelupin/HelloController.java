@@ -153,6 +153,7 @@ public class HelloController implements Initializable {
 
                 Tour tour = new Tour(tourSelectionnee, tourSelectionnee, caseX, caseY);
                 environnement.ajouterTour(tour);
+                System.out.println("Console : Tour ajouté");
 
                 TourVue tourVue = new TourVue(tour, pane);
                 tourVue.afficher();
@@ -164,6 +165,7 @@ public class HelloController implements Initializable {
 
     private void afficherMessageBudget() {
         Label msg = new Label("Budget insuffisant !");
+        System.out.println("Console : Budget insuffisant");
         msg.setStyle(
                 "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
                         "-fx-background-color: rgba(180,0,0,0.85);" +

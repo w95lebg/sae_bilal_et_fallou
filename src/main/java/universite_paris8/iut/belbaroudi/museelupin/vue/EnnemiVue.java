@@ -38,7 +38,7 @@ public class EnnemiVue {
         sprite.translateYProperty().bind(ennemi.yProperty());
 
         // Barre de vie
-        int barHeight = 8;
+        int barHeight = 12;
 
         barreVie = new ProgressBar(ennemi.getVie());
         barreVie.setPrefWidth(tileSize);

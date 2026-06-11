@@ -11,7 +11,7 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("vue1.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 640, 640);
+        Scene scene = new Scene(fxmlLoader.load(), 780, 640);
         stage.setTitle("Musée Lupin");
         stage.setScene(scene);
         stage.show();
