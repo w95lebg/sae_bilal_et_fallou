@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
 public class HelloController implements Initializable {
 
     private static final double VITESSE = 1.0;
-    private static final int    BUDGET_DEPART = 1000;
+    private static final int    BUDGET_DEPART = 2000;
 
     // { nom, imagePath, prix }
     private static final String[][] TOURS_DISPONIBLES = {
@@ -60,7 +60,8 @@ public class HelloController implements Initializable {
         terrainVue.chargerMap();
 
         Ennemi p1 = new Ennemi(0, 4, "E", terrain);
-        EnnemiVue ennemiVue = new EnnemiVue(p1, pane);
+        EnnemiVue ennemiVue = new EnnemiVue(p1, pane, "/pictures/enemy_faussaire.png");
+        ennemiVue.setOnMort(() -> faireApparaitreEnnemiSuivant());
         ennemiVue.creerSprite();
         this.environnement.ajouterPersonnage(p1);
 
@@ -72,14 +73,14 @@ public class HelloController implements Initializable {
     }
 
     private void remplirPanneauTours() {
-
+        // Label budget en haut du panneau
         Label labelBudget = new Label();
         labelBudget.setStyle(
                 "-fx-text-fill: #f1c40f; -fx-font-size: 14px; -fx-font-weight: bold;" +
                         "-fx-padding: 8 6 8 6;"
         );
-        // bind maj automatque
-        labelBudget.textProperty().bind(budget.asString("Budget : %d $"));
+        // Binding : se met à jour automatiquement quand budget change
+        labelBudget.textProperty().bind(budget.asString("💰 Budget : %d $"));
         panneauTours.getChildren().add(labelBudget);
 
         for (String[] tourInfo : TOURS_DISPONIBLES) {
@@ -148,12 +149,11 @@ public class HelloController implements Initializable {
                     caseX >= 0 && caseX < tab[0].length &&
                     tab[caseY][caseX] == 3) {
 
-                // maj
+                // Déduire le prix
                 budget.set(budget.get() - prixTourSelectionnee);
 
                 Tour tour = new Tour(tourSelectionnee, tourSelectionnee, caseX, caseY);
                 environnement.ajouterTour(tour);
-                System.out.println("Console : Tour ajouté");
 
                 TourVue tourVue = new TourVue(tour, pane);
                 tourVue.afficher();
@@ -164,8 +164,7 @@ public class HelloController implements Initializable {
     }
 
     private void afficherMessageBudget() {
-        Label msg = new Label("Budget insuffisant !");
-        System.out.println("Console : Budget insuffisant");
+        Label msg = new Label("❌ Budget insuffisant !");
         msg.setStyle(
                 "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
                         "-fx-background-color: rgba(180,0,0,0.85);" +
@@ -178,6 +177,13 @@ public class HelloController implements Initializable {
         new Timeline(new KeyFrame(Duration.millis(1500),
                 ev -> pane.getChildren().remove(msg))
         ).play();
+    }
+
+    private void faireApparaitreEnnemiSuivant() {
+        Ennemi p2 = new Ennemi(0, 4, "E", terrain);
+        EnnemiVue ennemiVue2 = new EnnemiVue(p2, pane, "/pictures/enemy_vandal.png");
+        ennemiVue2.creerSprite();
+        this.environnement.ajouterPersonnage(p2);
     }
 
     private void initAnimation() {

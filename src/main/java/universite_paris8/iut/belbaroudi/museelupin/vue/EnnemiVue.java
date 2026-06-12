@@ -15,11 +15,22 @@ public class EnnemiVue {
 
     private Ennemi ennemi;
     private Pane   pane;
+    private String imagePath;
     private ProgressBar barreVie;
+    private Runnable onMort;
 
     public EnnemiVue(Ennemi ennemi, Pane pane) {
-        this.ennemi = ennemi;
-        this.pane   = pane;
+        this(ennemi, pane, "/pictures/enemy_faussaire.png");
+    }
+
+    public EnnemiVue(Ennemi ennemi, Pane pane, String imagePath) {
+        this.ennemi    = ennemi;
+        this.pane      = pane;
+        this.imagePath = imagePath;
+    }
+
+    public void setOnMort(Runnable onMort) {
+        this.onMort = onMort;
     }
 
     public void creerSprite() {
@@ -27,7 +38,7 @@ public class EnnemiVue {
 
         // Sprite
         Image imageEnnemi = new Image(
-                getClass().getResourceAsStream("/pictures/enemy_faussaire.png")
+                getClass().getResourceAsStream(imagePath)
         );
         ImageView sprite = new ImageView(imageEnnemi);
         sprite.setFitWidth(tileSize);
@@ -38,7 +49,7 @@ public class EnnemiVue {
         sprite.translateYProperty().bind(ennemi.yProperty());
 
         // Barre de vie
-        int barHeight = 12;
+        int barHeight = 8;
 
         barreVie = new ProgressBar(ennemi.getVie());
         barreVie.setPrefWidth(tileSize);
@@ -59,12 +70,15 @@ public class EnnemiVue {
             barreVie.setProgress(vie);
 
             if (vie <= 0.0) {
-                // del sprite et bV
                 pane.getChildren().remove(sprite);
                 pane.getChildren().remove(barreVie);
 
-                // Afficher le message de mort
+
                 afficherMessageMort();
+
+                if (onMort != null) {
+                    onMort.run();
+                }
             }
         });
 
@@ -72,7 +86,7 @@ public class EnnemiVue {
     }
 
     private void afficherMessageMort() {
-        Label msg = new Label("Éliminé !");
+        Label msg = new Label("☠ Éliminé !");
         msg.setStyle(
                 "-fx-text-fill: red;" +
                         "-fx-font-size: 14px;" +
@@ -82,13 +96,12 @@ public class EnnemiVue {
                         "-fx-background-radius: 6;"
         );
 
-        // message au mm endroit que le sprite/ennemie enft
         msg.setTranslateX(ennemi.getX() - 20);
         msg.setTranslateY(ennemi.getY() - 30);
 
         pane.getChildren().add(msg);
 
-        // après 1.5 secondes
+        // 1.5s
         Timeline disparition = new Timeline(
                 new KeyFrame(Duration.millis(1500), e -> pane.getChildren().remove(msg))
         );
