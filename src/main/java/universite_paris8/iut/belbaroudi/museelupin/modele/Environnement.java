@@ -1,6 +1,5 @@
 package universite_paris8.iut.belbaroudi.museelupin.modele;
 
-import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
@@ -46,9 +45,8 @@ public class Environnement {
 
                 if (dx <= Terrain.tileSize * 2 && dy <= Terrain.tileSize * 2) {
                     if (!e.isDansPorteeLaser()) {
-                        e.prendresDegats(0.25);
+                        e.prendresDegats(0.5);
                         e.setDansPorteeLaser(true);
-
 
                         if (!toursASupprimer.contains(t)) {
                             toursASupprimer.add(t);
@@ -61,11 +59,12 @@ public class Environnement {
             }
         }
 
-        // Supprimer les tours lasers détruites
         for (Tour t : toursASupprimer) {
             tours.remove(t);
+            System.out.println("Suppression tour laser : spriteView=" + t.getSpriteView());
             if (t.getSpriteView() != null) {
-                Platform.runLater(() -> pane.getChildren().remove(t.getSpriteView()));
+                boolean removed = pane.getChildren().remove(t.getSpriteView());
+                System.out.println("  -> remove() retourne : " + removed);
             }
         }
     }

@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
 public class HelloController implements Initializable {
 
     private static final double VITESSE = 1.0;
-    private static final int    BUDGET_DEPART = 2000;
+    private static final int    BUDGET_DEPART = 1000;
 
     // { nom, imagePath, prix }
     private static final String[][] TOURS_DISPONIBLES = {
@@ -61,7 +61,7 @@ public class HelloController implements Initializable {
 
         Ennemi p1 = new Ennemi(0, 4, "E", terrain);
         EnnemiVue ennemiVue = new EnnemiVue(p1, pane, "/pictures/enemy_faussaire.png");
-        ennemiVue.setOnMort(() -> faireApparaitreEnnemiSuivant());
+        ennemiVue.setOnMort(() -> faireApparaitreEnnemi(2));
         ennemiVue.creerSprite();
         this.environnement.ajouterPersonnage(p1);
 
@@ -179,11 +179,33 @@ public class HelloController implements Initializable {
         ).play();
     }
 
-    private void faireApparaitreEnnemiSuivant() {
-        Ennemi p2 = new Ennemi(0, 4, "E", terrain);
-        EnnemiVue ennemiVue2 = new EnnemiVue(p2, pane, "/pictures/enemy_vandal.png");
-        ennemiVue2.creerSprite();
-        this.environnement.ajouterPersonnage(p2);
+    private void faireApparaitreEnnemi(int numero) {
+        Ennemi ennemi;
+        EnnemiVue ennemiVue;
+
+        switch (numero) {
+            case 2:
+                ennemi    = new Ennemi(0, 4, "E", terrain);
+                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_vandal.png");
+                ennemiVue.setOnMort(() -> faireApparaitreEnnemi(3));
+                break;
+
+            case 3:
+                ennemi    = new Ennemi(0, 4, "E", terrain);
+                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_gang.png");
+                ennemiVue.setOnMort(() -> faireApparaitreEnnemi(4));
+                break;
+            case 4:
+                ennemi    = new Ennemi(0, 4, "E", terrain);
+                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_pickpocket.png");
+                break;
+
+            default:
+                return;
+        }
+
+        ennemiVue.creerSprite();
+        this.environnement.ajouterPersonnage(ennemi);
     }
 
     private void initAnimation() {
