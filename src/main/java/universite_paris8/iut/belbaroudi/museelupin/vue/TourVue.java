@@ -28,6 +28,7 @@ public class TourVue {
         sprite.setTranslateX(tour.getCaseX() * Terrain.tileSize);
         sprite.setTranslateY(tour.getCaseY() * Terrain.tileSize);
 
+        tour.setSpriteView(sprite);
         pane.getChildren().add(sprite);
     }
 }

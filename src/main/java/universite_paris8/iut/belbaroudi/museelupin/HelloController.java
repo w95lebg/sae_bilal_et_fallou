@@ -26,30 +26,29 @@ import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
 
-    private static final double VITESSE = 1.0;
-    private static final int    BUDGET_DEPART = 1000;
+    private static final double VITESSE      = 1.0;
+    private static final int    BUDGET_DEPART = 999;
 
-    // { nom, imagePath, prix }
     private static final String[][] TOURS_DISPONIBLES = {
             { "Camera",     "/pictures/tower_camera.png",     "100" },
             { "Brouilleur", "/pictures/tower_brouilleur.png", "150" },
             { "Gardien",    "/pictures/tower_gardien.png",    "200" },
-            { "Laser",      "/pictures/tower_laser.png",      "250" },
-            { "Porte",      "/pictures/tower_porte.png",      "120" },
+            { "Laser",      "/pictures/tower_laser.png",      "150" },
+            { "Porte",      "/pictures/tower_porte.png",      "100" },
     };
 
-    private Terrain      terrain;
+    private Terrain       terrain;
     private Environnement environnement;
-    private Timeline     gameLoop;
+    private Timeline      gameLoop;
 
-    private String          tourSelectionnee     = null;
-    private int             prixTourSelectionnee = 0;
+    private String tourSelectionnee     = null;
+    private int    prixTourSelectionnee = 0;
 
     private IntegerProperty budget = new SimpleIntegerProperty(BUDGET_DEPART);
 
-    @FXML private Pane      pane;
-    @FXML private TilePane  paneTerrain;
-    @FXML private VBox      panneauTours;
+    @FXML private Pane     pane;
+    @FXML private TilePane paneTerrain;
+    @FXML private VBox     panneauTours;
 
     @Override
     public void initialize(URL url, ResourceBundle resourcebundle) {
@@ -73,13 +72,11 @@ public class HelloController implements Initializable {
     }
 
     private void remplirPanneauTours() {
-        // Label budget en haut du panneau
         Label labelBudget = new Label();
         labelBudget.setStyle(
                 "-fx-text-fill: #f1c40f; -fx-font-size: 14px; -fx-font-weight: bold;" +
                         "-fx-padding: 8 6 8 6;"
         );
-        // Binding : se met à jour automatiquement quand budget change
         labelBudget.textProperty().bind(budget.asString("💰 Budget : %d $"));
         panneauTours.getChildren().add(labelBudget);
 
@@ -135,30 +132,37 @@ public class HelloController implements Initializable {
         pane.setOnMouseClicked(e -> {
             if (tourSelectionnee == null) return;
 
-            // Vérifier le budget avant tout
             if (budget.get() < prixTourSelectionnee) {
                 afficherMessageBudget();
                 return;
             }
 
-            int caseX = (int) e.getX() / Terrain.tileSize;
-            int caseY = (int) e.getY() / Terrain.tileSize;
+            int caseX   = (int) e.getX() / Terrain.tileSize;
+            int caseY   = (int) e.getY() / Terrain.tileSize;
             int[][] tab = terrain.getTab();
 
             if (caseY >= 0 && caseY < tab.length &&
-                    caseX >= 0 && caseX < tab[0].length &&
-                    tab[caseY][caseX] == 3) {
+                    caseX >= 0 && caseX < tab[0].length) {
 
-                // Déduire le prix
-                budget.set(budget.get() - prixTourSelectionnee);
+                boolean estPorte  = tourSelectionnee.contains("porte");
+                boolean caseDispo = (tab[caseY][caseX] == 3)
+                        || (estPorte && tab[caseY][caseX] == 1);
 
-                Tour tour = new Tour(tourSelectionnee, tourSelectionnee, caseX, caseY);
-                environnement.ajouterTour(tour);
+                if (caseDispo) {
+                    budget.set(budget.get() - prixTourSelectionnee);
 
-                TourVue tourVue = new TourVue(tour, pane);
-                tourVue.afficher();
+                    Tour tour = new Tour(tourSelectionnee, tourSelectionnee, caseX, caseY);
+                    environnement.ajouterTour(tour);
 
-                tab[caseY][caseX] = 0;
+                    TourVue tourVue = new TourVue(tour, pane);
+                    tourVue.afficher();
+
+                    // La porte reste sur une case 1 (chemin) pour que l'ennemi puisse y aller
+                    // Les autres tours bloquent la case en mettant 0
+                    if (!tourSelectionnee.contains("porte")) {
+                        tab[caseY][caseX] = 0;
+                    }
+                }
             }
         });
     }
@@ -180,7 +184,7 @@ public class HelloController implements Initializable {
     }
 
     private void faireApparaitreEnnemi(int numero) {
-        Ennemi ennemi;
+        Ennemi    ennemi;
         EnnemiVue ennemiVue;
 
         switch (numero) {
@@ -189,7 +193,6 @@ public class HelloController implements Initializable {
                 ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_vandal.png");
                 ennemiVue.setOnMort(() -> faireApparaitreEnnemi(3));
                 break;
-
             case 3:
                 ennemi    = new Ennemi(0, 4, "E", terrain);
                 ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_gang.png");
@@ -199,7 +202,6 @@ public class HelloController implements Initializable {
                 ennemi    = new Ennemi(0, 4, "E", terrain);
                 ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_pickpocket.png");
                 break;
-
             default:
                 return;
         }

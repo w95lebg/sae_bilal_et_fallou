@@ -10,17 +10,21 @@ public class Ennemi extends Acteur {
     private DoubleProperty vie = new SimpleDoubleProperty(1.0);
 
     private boolean dansPorteeLaser = false;
+    private boolean bloque          = false;
 
     public Ennemi(int x, int y, String code, Terrain e) {
         super(x, y, code, e);
     }
 
     // vie
-    public double getVie()               { return vie.get(); }
-    public DoubleProperty vieProperty()  { return vie; }
+    public double getVie()              { return vie.get(); }
+    public DoubleProperty vieProperty() { return vie; }
 
-    public boolean isDansPorteeLaser()            { return dansPorteeLaser; }
-    public void    setDansPorteeLaser(boolean v)  { dansPorteeLaser = v; }
+    public boolean isDansPorteeLaser()           { return dansPorteeLaser; }
+    public void    setDansPorteeLaser(boolean v) { dansPorteeLaser = v; }
+
+    public boolean isBloque()           { return bloque; }
+    public void    setBloque(boolean v) { bloque = v; }
 
     public void prendresDegats(double pourcentage) {
         vie.set(Math.max(0.0, vie.get() - pourcentage));
@@ -28,7 +32,12 @@ public class Ennemi extends Acteur {
 
     public boolean estMort() { return vie.get() <= 0.0; }
 
-    // direction
+    @Override
+    public void avancer(double vitesse) {
+        if (bloque) return;
+        super.avancer(vitesse);
+    }
+
     @Override
     public void move() {
         int tileSize = Terrain.tileSize;

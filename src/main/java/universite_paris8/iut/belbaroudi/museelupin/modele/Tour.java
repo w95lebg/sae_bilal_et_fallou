@@ -26,6 +26,14 @@ public class Tour {
         return imagePath != null && imagePath.contains("laser");
     }
 
+    public boolean estPorte() {
+        return imagePath != null && imagePath.contains("porte");
+    }
+
+    private boolean activee = false;
+    public boolean isActivee()          { return activee; }
+    public void    setActivee(boolean v){ activee = v; }
+
     public ImageView getSpriteView()            { return spriteView; }
     public void      setSpriteView(ImageView v) { spriteView = v; }
 }

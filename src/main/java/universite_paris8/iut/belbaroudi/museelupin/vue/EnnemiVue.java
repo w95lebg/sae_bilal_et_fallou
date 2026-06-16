@@ -48,7 +48,7 @@ public class EnnemiVue {
         sprite.translateXProperty().bind(ennemi.xProperty());
         sprite.translateYProperty().bind(ennemi.yProperty());
 
-        // Barre de vie
+
         int barHeight = 8;
 
         barreVie = new ProgressBar(ennemi.getVie());
@@ -70,6 +70,7 @@ public class EnnemiVue {
             barreVie.setProgress(vie);
 
             if (vie <= 0.0) {
+                // del bv spr
                 pane.getChildren().remove(sprite);
                 pane.getChildren().remove(barreVie);
 
@@ -96,12 +97,12 @@ public class EnnemiVue {
                         "-fx-background-radius: 6;"
         );
 
+        // msg fin met chkoun li met
         msg.setTranslateX(ennemi.getX() - 20);
         msg.setTranslateY(ennemi.getY() - 30);
 
         pane.getChildren().add(msg);
 
-        // 1.5s
         Timeline disparition = new Timeline(
                 new KeyFrame(Duration.millis(1500), e -> pane.getChildren().remove(msg))
         );
