@@ -9,33 +9,49 @@ public class Ennemi extends Acteur {
 
     private DoubleProperty vie = new SimpleDoubleProperty(1.0);
 
+    // État : effets des tours
     private boolean dansPorteeLaser = false;
     private boolean bloque          = false;
+    private boolean ralenti         = false;
+    private double  facteurVitesse  = 1.0;
+
+    // Référence à la tour caméra qui ralentit cet ennemi (évite les conflits)
+    private Tour sourceDuRalentissement = null;
 
     public Ennemi(int x, int y, String code, Terrain e) {
         super(x, y, code, e);
     }
 
-    // vie
-    public double getVie()              { return vie.get(); }
-    public DoubleProperty vieProperty() { return vie; }
+    // --- Vie ---
+    public double          getVie()             { return vie.get(); }
+    public DoubleProperty  vieProperty()        { return vie; }
+    public boolean         estMort()            { return vie.get() <= 0.0; }
+    public void prendresDegats(double pct)      { vie.set(Math.max(0.0, vie.get() - pct)); }
 
+    // --- Laser ---
     public boolean isDansPorteeLaser()           { return dansPorteeLaser; }
     public void    setDansPorteeLaser(boolean v) { dansPorteeLaser = v; }
 
+    // --- Porte ---
     public boolean isBloque()           { return bloque; }
     public void    setBloque(boolean v) { bloque = v; }
 
-    public void prendresDegats(double pourcentage) {
-        vie.set(Math.max(0.0, vie.get() - pourcentage));
-    }
+    // --- Caméra ---
+    public boolean isRalenti()             { return ralenti; }
+    public void    setRalenti(boolean v)   { ralenti = v; }
+    public double  getFacteurVitesse()     { return facteurVitesse; }
+    public void    setFacteurVitesse(double v) { facteurVitesse = v; }
 
-    public boolean estMort() { return vie.get() <= 0.0; }
+    /** Permet à la caméra de savoir si c'est bien elle qui ralentit cet ennemi. */
+    public boolean isRalentiParCamera(Tour source) {
+        return ralenti && sourceDuRalentissement == source;
+    }
+    public void setSourceDuRalentissement(Tour t) { sourceDuRalentissement = t; }
 
     @Override
     public void avancer(double vitesse) {
         if (bloque) return;
-        super.avancer(vitesse);
+        super.avancer(vitesse * facteurVitesse);
     }
 
     @Override

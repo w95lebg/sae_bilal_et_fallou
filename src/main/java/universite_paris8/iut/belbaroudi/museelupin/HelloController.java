@@ -17,6 +17,7 @@ import universite_paris8.iut.belbaroudi.museelupin.modele.Ennemi;
 import universite_paris8.iut.belbaroudi.museelupin.modele.Environnement;
 import universite_paris8.iut.belbaroudi.museelupin.modele.Terrain;
 import universite_paris8.iut.belbaroudi.museelupin.modele.Tour;
+import universite_paris8.iut.belbaroudi.museelupin.modele.tours.*;
 import universite_paris8.iut.belbaroudi.museelupin.vue.EnnemiVue;
 import universite_paris8.iut.belbaroudi.museelupin.vue.TerrainVue;
 import universite_paris8.iut.belbaroudi.museelupin.vue.TourVue;
@@ -26,9 +27,11 @@ import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
 
-    private static final double VITESSE      = 1.0;
+    private static final double VITESSE       = 1.0;
     private static final int    BUDGET_DEPART = 999;
+    private static final int    GAIN_PAR_ENNEMI = 50;
 
+    // Informations des tours disponibles : nom, image, prix
     private static final String[][] TOURS_DISPONIBLES = {
             { "Camera",     "/pictures/tower_camera.png",     "100" },
             { "Brouilleur", "/pictures/tower_brouilleur.png", "150" },
@@ -58,18 +61,25 @@ public class HelloController implements Initializable {
         TerrainVue terrainVue = new TerrainVue(terrain, paneTerrain);
         terrainVue.chargerMap();
 
+        // Premier ennemi
         Ennemi p1 = new Ennemi(0, 4, "E", terrain);
         EnnemiVue ennemiVue = new EnnemiVue(p1, pane, "/pictures/enemy_faussaire.png");
-        ennemiVue.setOnMort(() -> faireApparaitreEnnemi(2));
+        ennemiVue.setOnMort(() -> {
+            budget.set(budget.get() + GAIN_PAR_ENNEMI);
+            faireApparaitreEnnemi(2);
+        });
         ennemiVue.creerSprite();
         this.environnement.ajouterPersonnage(p1);
 
         remplirPanneauTours();
         gererClicSurTerrain();
-
         initAnimation();
         gameLoop.play();
     }
+
+    // -----------------------------------------------------------------------
+    // Construction du panneau latéral des tours
+    // -----------------------------------------------------------------------
 
     private void remplirPanneauTours() {
         Label labelBudget = new Label();
@@ -85,53 +95,63 @@ public class HelloController implements Initializable {
             String imagePath = tourInfo[1];
             int    prix      = Integer.parseInt(tourInfo[2]);
 
-            VBox bouton = new VBox(4);
-            bouton.setStyle(
-                    "-fx-background-color: #3c3f41; -fx-padding: 6; " +
-                            "-fx-border-color: #555; -fx-border-width: 1; -fx-cursor: hand;"
-            );
-            bouton.setPrefWidth(120);
-
-            Image img = new Image(getClass().getResourceAsStream(imagePath));
-            ImageView iv = new ImageView(img);
-            iv.setFitWidth(48);
-            iv.setFitHeight(48);
-            iv.setPreserveRatio(true);
-
-            Label labelNom  = new Label(nom);
-            labelNom.setStyle("-fx-text-fill: white; -fx-font-size: 12;");
-
-            Label labelPrix = new Label(prix + " $");
-            labelPrix.setStyle("-fx-text-fill: #f1c40f; -fx-font-size: 11;");
-
-            bouton.getChildren().addAll(iv, labelNom, labelPrix);
-
-            bouton.setOnMouseClicked(e -> {
-                tourSelectionnee     = imagePath;
-                prixTourSelectionnee = prix;
-
-                for (javafx.scene.Node node : panneauTours.getChildren()) {
-                    if (node instanceof VBox) {
-                        node.setStyle(
-                                "-fx-background-color: #3c3f41; -fx-padding: 6; " +
-                                        "-fx-border-color: #555; -fx-border-width: 1; -fx-cursor: hand;"
-                        );
-                    }
-                }
-                bouton.setStyle(
-                        "-fx-background-color: #4a6fa5; -fx-padding: 6; " +
-                                "-fx-border-color: #aad4f5; -fx-border-width: 2; -fx-cursor: hand;"
-                );
-            });
-
+            VBox bouton = creerBoutonTour(nom, imagePath, prix);
             panneauTours.getChildren().add(bouton);
         }
     }
 
+    private VBox creerBoutonTour(String nom, String imagePath, int prix) {
+        VBox bouton = new VBox(4);
+        bouton.setStyle(
+                "-fx-background-color: #3c3f41; -fx-padding: 6; " +
+                        "-fx-border-color: #555; -fx-border-width: 1; -fx-cursor: hand;"
+        );
+        bouton.setPrefWidth(120);
+
+        Image     img = new Image(getClass().getResourceAsStream(imagePath));
+        ImageView iv  = new ImageView(img);
+        iv.setFitWidth(48);
+        iv.setFitHeight(48);
+        iv.setPreserveRatio(true);
+
+        Label labelNom  = new Label(nom);
+        labelNom.setStyle("-fx-text-fill: white; -fx-font-size: 12;");
+
+        Label labelPrix = new Label(prix + " $");
+        labelPrix.setStyle("-fx-text-fill: #f1c40f; -fx-font-size: 11;");
+
+        bouton.getChildren().addAll(iv, labelNom, labelPrix);
+
+        bouton.setOnMouseClicked(e -> {
+            tourSelectionnee     = imagePath;
+            prixTourSelectionnee = prix;
+            mettreEnSurbrilanceBouton(bouton);
+        });
+
+        return bouton;
+    }
+
+
+    private void mettreEnSurbrilanceBouton(VBox boutonChoisi) {
+        for (javafx.scene.Node node : panneauTours.getChildren()) {
+            if (node instanceof VBox) {
+                node.setStyle(
+                        "-fx-background-color: #3c3f41; -fx-padding: 6; " +
+                                "-fx-border-color: #555; -fx-border-width: 1; -fx-cursor: hand;"
+                );
+            }
+        }
+        boutonChoisi.setStyle(
+                "-fx-background-color: #4a6fa5; -fx-padding: 6; " +
+                        "-fx-border-color: #aad4f5; -fx-border-width: 2; -fx-cursor: hand;"
+        );
+    }
+
+
+
     private void gererClicSurTerrain() {
         pane.setOnMouseClicked(e -> {
             if (tourSelectionnee == null) return;
-
             if (budget.get() < prixTourSelectionnee) {
                 afficherMessageBudget();
                 return;
@@ -141,31 +161,75 @@ public class HelloController implements Initializable {
             int caseY   = (int) e.getY() / Terrain.tileSize;
             int[][] tab = terrain.getTab();
 
-            if (caseY >= 0 && caseY < tab.length &&
-                    caseX >= 0 && caseX < tab[0].length) {
+            if (caseY < 0 || caseY >= tab.length || caseX < 0 || caseX >= tab[0].length) return;
 
-                boolean estPorte  = tourSelectionnee.contains("porte");
-                boolean caseDispo = (tab[caseY][caseX] == 3)
-                        || (estPorte && tab[caseY][caseX] == 1);
+            boolean estPorte  = tourSelectionnee.contains("porte");
+            boolean caseDispo = (tab[caseY][caseX] == 3)
+                    || (estPorte && tab[caseY][caseX] == 1);
 
-                if (caseDispo) {
-                    budget.set(budget.get() - prixTourSelectionnee);
+            if (caseDispo) {
+                budget.set(budget.get() - prixTourSelectionnee);
 
-                    Tour tour = new Tour(tourSelectionnee, tourSelectionnee, caseX, caseY);
-                    environnement.ajouterTour(tour);
+                Tour tour = creerTour(tourSelectionnee, caseX, caseY);
+                environnement.ajouterTour(tour);
 
-                    TourVue tourVue = new TourVue(tour, pane);
-                    tourVue.afficher();
+                TourVue tourVue = new TourVue(tour, pane);
+                tourVue.afficher();
 
-                    // La porte reste sur une case 1 (chemin) pour que l'ennemi puisse y aller
-                    // Les autres tours bloquent la case en mettant 0
-                    if (!tourSelectionnee.contains("porte")) {
-                        tab[caseY][caseX] = 0;
-                    }
+
+                if (!estPorte) {
+                    tab[caseY][caseX] = 0;
                 }
             }
         });
     }
+
+
+    private Tour creerTour(String imagePath, int caseX, int caseY) {
+        if (imagePath.contains("laser"))      return new TourLaser(caseX, caseY);
+        if (imagePath.contains("porte"))      return new TourPorte(caseX, caseY);
+        if (imagePath.contains("camera"))     return new TourCamera(caseX, caseY);
+        if (imagePath.contains("brouilleur")) return new TourBrouilleur(caseX, caseY);
+        if (imagePath.contains("gardien"))    return new TourGardien(caseX, caseY);
+        throw new IllegalArgumentException("Type de tour inconnu : " + imagePath);
+    }
+
+
+
+    private void faireApparaitreEnnemi(int numero) {
+        Ennemi    ennemi;
+        EnnemiVue ennemiVue;
+
+        switch (numero) {
+            case 2:
+                ennemi    = new Ennemi(0, 4, "E", terrain);
+                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_vandal.png");
+                ennemiVue.setOnMort(() -> {
+                    budget.set(budget.get() + GAIN_PAR_ENNEMI);
+                    faireApparaitreEnnemi(3);
+                });
+                break;
+            case 3:
+                ennemi    = new Ennemi(0, 4, "E", terrain);
+                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_gang.png");
+                ennemiVue.setOnMort(() -> {
+                    budget.set(budget.get() + GAIN_PAR_ENNEMI);
+                    faireApparaitreEnnemi(4);
+                });
+                break;
+            case 4:
+                ennemi    = new Ennemi(0, 4, "E", terrain);
+                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_pickpocket.png");
+                ennemiVue.setOnMort(() -> budget.set(budget.get() + GAIN_PAR_ENNEMI));
+                break;
+            default:
+                return;
+        }
+
+        ennemiVue.creerSprite();
+        this.environnement.ajouterPersonnage(ennemi);
+    }
+
 
     private void afficherMessageBudget() {
         Label msg = new Label("❌ Budget insuffisant !");
@@ -183,40 +247,13 @@ public class HelloController implements Initializable {
         ).play();
     }
 
-    private void faireApparaitreEnnemi(int numero) {
-        Ennemi    ennemi;
-        EnnemiVue ennemiVue;
 
-        switch (numero) {
-            case 2:
-                ennemi    = new Ennemi(0, 4, "E", terrain);
-                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_vandal.png");
-                ennemiVue.setOnMort(() -> faireApparaitreEnnemi(3));
-                break;
-            case 3:
-                ennemi    = new Ennemi(0, 4, "E", terrain);
-                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_gang.png");
-                ennemiVue.setOnMort(() -> faireApparaitreEnnemi(4));
-                break;
-            case 4:
-                ennemi    = new Ennemi(0, 4, "E", terrain);
-                ennemiVue = new EnnemiVue(ennemi, pane, "/pictures/enemy_pickpocket.png");
-                break;
-            default:
-                return;
-        }
-
-        ennemiVue.creerSprite();
-        this.environnement.ajouterPersonnage(ennemi);
-    }
 
     private void initAnimation() {
         this.gameLoop = new Timeline();
         this.gameLoop.setCycleCount(Timeline.INDEFINITE);
-        KeyFrame kf = new KeyFrame(
-                Duration.millis(16),
-                ev -> environnement.unTour(VITESSE)
+        this.gameLoop.getKeyFrames().add(
+                new KeyFrame(Duration.millis(16), ev -> environnement.unTour(VITESSE))
         );
-        this.gameLoop.getKeyFrames().add(kf);
     }
 }
